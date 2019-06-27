@@ -60,7 +60,6 @@ public class Register extends AppCompatActivity {
                             myConnection.setRequestProperty("password", password);
                             myConnection.setRequestProperty("mail", email);
 
-                            System.out.println(myConnection.getResponseCode()+username+password+email+urlAddress);
                             response = myConnection.getResponseCode();
 
                         } catch (MalformedURLException e) {

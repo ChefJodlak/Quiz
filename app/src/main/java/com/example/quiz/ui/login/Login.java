@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -22,14 +21,6 @@ import android.widget.Toast;
 
 import com.example.quiz.MainScreen;
 import com.example.quiz.R;
-import com.example.quiz.ui.login.LoginViewModel;
-import com.example.quiz.ui.login.LoginViewModelFactory;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class Login extends AppCompatActivity {
 
@@ -45,7 +36,7 @@ public class Login extends AppCompatActivity {
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
-        final Button loginButton = findViewById(R.id.login);
+        final Button loginButton = findViewById(R.id.login2);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
