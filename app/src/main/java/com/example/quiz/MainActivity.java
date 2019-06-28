@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.quiz.data.Endpoint;
 import com.example.quiz.ui.login.Login;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -15,8 +17,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-
-    private String url = "http://34.98.75.32/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +42,15 @@ public class MainActivity extends AppCompatActivity {
                 //1. Create okHttp Client object
                 OkHttpClient client = new OkHttpClient();
 
+                Endpoint endpoint = new Endpoint();
+
                 //2. Define request being sent to the server
                 RequestBody postData = new FormBody.Builder()
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("http://34.98.75.32/")
+                        .url(endpoint.getUrl())
+                        .header("Connection", "close")
                         .build();
 
                 //3. Transport the request and wait for response to process next

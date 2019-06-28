@@ -4,10 +4,10 @@ import org.json.*;
 
 public class GetQuestions {
 
-    public String questionID, question, answer1, answer2, answer3, answer4, unparsedJSON;
+    public String questionID, question, answer1, answer2, answer3, answer4;
+
 
     public GetQuestions(String unparsedJSON){
-        this.unparsedJSON = unparsedJSON;
         parseJSON(unparsedJSON);
     }
 
@@ -31,11 +31,15 @@ public class GetQuestions {
         this.answer4 = answer4;
     }
 
-    public void parseJSON(String unparsedJSON){
+    private void parseJSON(String unparsedJSON){
+
         try {
             JSONObject obj = new JSONObject(unparsedJSON);
+
             setQuestionID(obj.getString("questionId"));
             setQuestion(obj.getString("question"));
+
+
             JSONArray arr = obj.getJSONArray("answers");
             for(int i = 0; i < arr.length(); i++){
                 if (i == 0){
@@ -48,7 +52,6 @@ public class GetQuestions {
                     setAnswer4(arr.getString(i));
                 }
             }
-
 
         }catch(JSONException e){
             e.printStackTrace();

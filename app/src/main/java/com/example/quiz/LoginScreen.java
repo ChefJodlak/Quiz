@@ -17,7 +17,6 @@ import okhttp3.Response;
 
 public class LoginScreen extends AppCompatActivity {
 
-    private String url = "http://34.98.75.32/";
     private String login, password;
     private EditText usernameEditText,passwordEditText;
     Button button;
