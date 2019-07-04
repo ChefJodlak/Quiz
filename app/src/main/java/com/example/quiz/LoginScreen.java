@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.quiz.data.Endpoint;
+
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -45,6 +47,8 @@ public class LoginScreen extends AppCompatActivity {
         protected String doInBackground(String... params) {
 
             try {
+
+                Endpoint endpoint = new Endpoint();
                 //1. Create okHttp Client object
                 login = usernameEditText.getText().toString();
                 password = passwordEditText.getText().toString();
@@ -55,7 +59,7 @@ public class LoginScreen extends AppCompatActivity {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("http://34.98.75.32/users/login?user="+login+"&pass="+password)
+                        .url(endpoint.getUrl()+"login?user="+login+"&pass="+password)
                         .build();
 
                 //3. Transport the request and wait for response to process next

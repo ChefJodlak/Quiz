@@ -18,7 +18,7 @@ import com.example.quiz.quiz.GetQuestions;
 
 public class Quiz extends AppCompatActivity {
 
-    private String result, resultAnswer;
+    private String resultAnswer;
 
     private int userAnswer;
     private Button answer1, answer2, answer3, answer4;
@@ -29,9 +29,11 @@ public class Quiz extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        new GetQuiz().execute();
+        
+        Intent intent = getIntent();
+        final String json = intent.getStringExtra("json");
         setContentView(R.layout.activity_quiz);
+        setQuizValues(json);
 
         answer1 = findViewById(R.id.answer1);
         answer2 = findViewById(R.id.answer2);
@@ -41,6 +43,7 @@ public class Quiz extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setUserAnswer(1);
+                setChosenAnswer(answer1);
                 new CheckAnswer().execute();
             }
         });
@@ -49,6 +52,7 @@ public class Quiz extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setUserAnswer(2);
+                setChosenAnswer(answer2);
                 new CheckAnswer().execute();
             }
         });
@@ -57,6 +61,7 @@ public class Quiz extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setUserAnswer(3);
+                setChosenAnswer(answer3);
                 new CheckAnswer().execute();
             }
         });
@@ -64,6 +69,7 @@ public class Quiz extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setUserAnswer(4);
+                setChosenAnswer(answer4);
                 new CheckAnswer().execute();
             }
         });
@@ -80,15 +86,26 @@ public class Quiz extends AppCompatActivity {
         ((Button)findViewById(R.id.answer4)).setText(questions.answer4);
     }
 
-    private void checkAnswer(String resultAnswer){
+    public void checkAnswer(String resultAnswer){
         CheckQuestions checkAnswer = new CheckQuestions(resultAnswer);
+        int correctAnswer = checkAnswer.correctAnswer;
+
+        Button buttons[] = new Button[]{answer1, answer2, answer3, answer4};
+        setCorrectAnswer(buttons[correctAnswer-1]);
 
         if(checkAnswer.getIsCorrectAnswer()){
             showSuccessAlert();
         }else{
             showFailedAlert();
         }
+    }
 
+    private void setChosenAnswer(Button button){
+        button.setBackgroundResource(R.drawable.chosen_answer_button);
+    }
+
+    private void setCorrectAnswer(Button button){
+        button.setBackgroundResource(R.drawable.correct_answer_button);
     }
 
     public void showSuccessAlert(){
@@ -126,41 +143,7 @@ public class Quiz extends AppCompatActivity {
         finish();
     }
 
-    public class GetQuiz extends AsyncTask<String, Void, String> {
 
-        @Override
-        protected String doInBackground(String... params){
-
-            try {
-                //1. Create okHttp Client object
-                OkHttpClient client = new OkHttpClient();
-                Endpoint endpoint = new Endpoint();
-
-                //2. Define request being sent to the server
-                Request request = new Request.Builder()
-                        .url(endpoint.getUrl()+"questions/random")
-                        //.header("token", "")
-                        .build();
-
-                //3. Transport the request and wait for response to process next
-                Response response = client.newCall(request).execute();
-                result = response.body().string();
-                return result;
-
-
-            }
-            catch(Exception e) {
-                return null;
-            }
-        }
-        @Override
-        protected void onPostExecute(String s){
-            super.onPostExecute(s);
-            System.out.println(result);
-            setQuizValues(result);
-        }
-
-    }
 
     public class CheckAnswer extends AsyncTask<String, Void, String> {
 

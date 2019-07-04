@@ -1,5 +1,7 @@
 package com.example.quiz;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.quiz.data.Endpoint;
-import com.example.quiz.ui.login.Login;
+
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,23 +20,55 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    int code;
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         new GetServerStatus().execute();
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button login_button =findViewById(R.id.login_button);
+        login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToLoginScreen();
+                if(code == 200) {
+                    goToLoginScreen();
+                }else{
+                    showFailedAlert();
+                }
+            }
+        });
+        Button register_button =findViewById(R.id.register_button);
+        register_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(code == 200) {
+                    goToRegisterScreen();
+                }else{
+                    showFailedAlert();
+                }
             }
         });
     }
-
+    public void showFailedAlert(){
+        AlertDialog.Builder myAlert = new AlertDialog.Builder(this);
+        myAlert.setMessage("Connection error with the server")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        myAlert.show();
+    }
     public class GetServerStatus extends AsyncTask<String, Void, String>{
-
+        private String result;
         @Override
         protected String doInBackground(String... params){
 
@@ -56,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 //3. Transport the request and wait for response to process next
                 Response response = client.newCall(request).execute();
                 String result = response.body().string();
+                setCode(response.code());
                 return result;
             }
             catch(Exception e) {
@@ -72,6 +107,12 @@ public class MainActivity extends AppCompatActivity {
     private void goToLoginScreen()
     {
         Intent intent = new Intent(this, Login3.class);
+        startActivity(intent);
+    }
+
+    private void goToRegisterScreen()
+    {
+        Intent intent = new Intent(this, Register.class);
         startActivity(intent);
     }
 }

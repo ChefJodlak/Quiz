@@ -4,8 +4,8 @@ import org.json.*;
 
 public class CheckQuestions {
 
-    private int correctAnswer;
-    private boolean isCorrectAnswer;
+    public int correctAnswer;
+    public boolean isCorrectAnswer;
 
     public void setCorrectAnswer(int correctAnswer) {
         this.correctAnswer = correctAnswer;

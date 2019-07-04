@@ -1,9 +1,6 @@
 package com.example.quiz;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -11,105 +8,104 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
+import com.example.quiz.data.Endpoint;
+import com.example.quiz.register.RegisterUtils;
+import com.example.quiz.utilities.ViewDialog;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class Register extends AppCompatActivity {
-
-    String urlAddress="https://quiz-backend-1.appspot.com/users/register/";
-    EditText usernameEditText,passwordEditText,emailEditText;
-    Button registerButton;
-    String username, password, email;
-    Integer response = 0;
+    ViewDialog viewDialog;
+    RegisterUtils registerUtils;
+    AlertDialog.Builder myAlert;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        myAlert = new AlertDialog.Builder(this);
 
-        usernameEditText = (EditText) findViewById(R.id.register_username);
-        passwordEditText = (EditText) findViewById(R.id.register_password);
-        emailEditText = (EditText) findViewById(R.id.register_email);
-        registerButton = (Button) findViewById(R.id.register_button);
+        viewDialog = new ViewDialog(this);
+        registerUtils = new RegisterUtils(this, this);
+
+        Button registerButton = findViewById(R.id.register_button);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//START ASYNC TASK
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-
-                            URL registerEndpoint = new URL(urlAddress);
-
-                            username = usernameEditText.getText().toString();
-                            password = passwordEditText.getText().toString();
-                            email = emailEditText.getText().toString();
-
-// Create connection
-                            HttpsURLConnection myConnection =
-                                    (HttpsURLConnection) registerEndpoint.openConnection();
-                            myConnection.setRequestMethod("POST");
-
-                            myConnection.setRequestProperty("user", username);
-                            myConnection.setRequestProperty("password", password);
-                            myConnection.setRequestProperty("mail", email);
-
-                            response = myConnection.getResponseCode();
-
-                        } catch (MalformedURLException e) {
-                            //bad  URL, tell the user
-                        } catch (IOException e) {
-                            //network error/ tell the user
-                        }
-                    }
-                });
-                if (response == 200) {
-                    // Success
-                    // Further processing here
-                } else {
-                    showSuccessAlert();
-
+                if (registerUtils.checkRegister((EditText)findViewById(R.id.register_username),
+                        (EditText)findViewById(R.id.register_password),
+                        (EditText)findViewById(R.id.register_email))) {
+                    new RegisterAccount().execute();
                 }
-            }
-
-        });
+            } });
     }
-    private void goToLoginScreen()
+
+    public void goToLoginScreen()
     {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
-    public void showSuccessAlert(){
-        AlertDialog.Builder myAlert = new AlertDialog.Builder(this);
-        myAlert.setCancelable(false);
-        myAlert.setMessage("Success!")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        goToLoginScreen();
-                    }
-                })
-                .create();
-        myAlert.show();
-    }
-    public void showFailedAlert(){
-        AlertDialog.Builder myAlert = new AlertDialog.Builder(this);
-        myAlert.setMessage("Fail! Please provide correct data!")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        myAlert.show();
+
+    public class RegisterAccount extends AsyncTask<String, Void, String>{
+        private String result;
+        private int code;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            viewDialog.showDialog();
+
+        }
+        @Override
+        protected String doInBackground(String... params){
+            EditText usernameEditText = findViewById(R.id.register_username);
+            EditText passwordEditText = findViewById(R.id.register_password);
+            EditText emailEditText = findViewById(R.id.register_email);
+            try {
+                //1. Create okHttp Client object
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .retryOnConnectionFailure(true)
+                        .build();
+
+                Endpoint endpoint = new Endpoint();
+
+                //2. Define request being sent to the server
+                RequestBody formBody = new FormBody.Builder()
+                        .add("user", usernameEditText.toString())
+                        .add("password", passwordEditText.toString())
+                        .add("email", emailEditText.toString())
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(endpoint.getUrl()+"users/register")
+                        .post(formBody)
+                        .header("Connection", "close")
+                        .build();
+
+                //3. Transport the request and wait for response to process next
+                Response response = client.newCall(request).execute();
+                String result = response.body().string();
+                code = response.code();
+                return result;
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String s){
+            super.onPostExecute(s);
+            viewDialog.hideDialog();
+            System.out.println(result+code);
+            if (code == 200) {
+                registerUtils.showSuccessAlert(myAlert);
+            }else{
+                registerUtils.showFailedAlert(myAlert);
+            }
+        }
     }
 }
