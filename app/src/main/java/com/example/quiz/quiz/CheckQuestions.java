@@ -1,7 +1,9 @@
 package com.example.quiz.quiz;
 import org.json.*;
 
-
+/**
+ * The GetQuestion class is made for parsing the json with the correct answer.
+ */
 public class CheckQuestions {
 
     public int correctAnswer;
@@ -20,11 +22,21 @@ public class CheckQuestions {
         return isCorrectAnswer;
     }
 
+    /**
+     * Public method for checking the correct answer.
+     *
+     * @param unparsedJSON          unparsed json with the correct answers
+     */
     public CheckQuestions(String unparsedJSON){
         checkAnswer(unparsedJSON);
     }
 
-    public void checkAnswer(String unparsedJSON){
+    /**
+     * Method for parsing a json and setting the variables
+     *
+     * @param unparsedJSON          unparsed json with the correct answers
+     */
+    private void checkAnswer(String unparsedJSON){
 
         try {
             JSONObject obj = new JSONObject(unparsedJSON);

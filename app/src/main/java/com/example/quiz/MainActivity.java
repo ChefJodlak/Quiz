@@ -9,19 +9,29 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.quiz.data.Endpoint;
 
-import okhttp3.FormBody;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * The MainActivity class has three main reasons:
+ * 1) Check server status
+ * 2) Lead user to the Login screen
+ * 3) Lead user to the Register screen
+ */
 public class MainActivity extends AppCompatActivity {
 
     int code;
 
+    /**
+     * Set response code that
+     * @param code      code that is returned by the Http request
+     */
     public void setCode(int code) {
         this.code = code;
     }
@@ -31,7 +41,13 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Check server status, if server is ON then allow user to proceeding to the Login/Register
+        //Screen
         new GetServerStatus().execute();
+
+        //Upon pressing login button, user is leaded to the
+        // Login screen(if the server in online)
         Button login_button =findViewById(R.id.login_button);
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        //Upon pressing register button, user is leaded to the
+        // Register screen(if the server in online)
         Button register_button =findViewById(R.id.register_button);
         register_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Display error Alert
+     */
     public void showFailedAlert(){
         AlertDialog.Builder myAlert = new AlertDialog.Builder(this);
         myAlert.setMessage("Connection error with the server")
@@ -67,8 +89,18 @@ public class MainActivity extends AppCompatActivity {
                 .create();
         myAlert.show();
     }
+
+    /**
+     * The GetServerStatus is an Async class that is made for sending a HTTP Request to the endpoint
+     * that is displaying server status.
+     */
     public class GetServerStatus extends AsyncTask<String, Void, String>{
-        private String result;
+
+        /**
+         * Send Http request to the endpoint whose task is to display server status.
+         *
+         * @return      return result of the Http request
+         */
         @Override
         protected String doInBackground(String... params){
 
@@ -79,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 Endpoint endpoint = new Endpoint();
 
                 //2. Define request being sent to the server
-                RequestBody postData = new FormBody.Builder()
-                        .build();
 
                 Request request = new Request.Builder()
                         .url(endpoint.getUrl())
@@ -97,19 +127,37 @@ public class MainActivity extends AppCompatActivity {
                 return null;
             }
             }
+
+        /**
+         * Set the value of Edit Text with the server status.
+         */
         @Override
         protected void onPostExecute(String s){
             super.onPostExecute(s);
-            TextView textview = (TextView) findViewById(R.id.status);
-            textview.setText(s);
+            TextView textview = findViewById(R.id.status);
+            try {
+                JSONObject obj = new JSONObject(s);
+                if(obj.getBoolean("alive")){
+                    textview.setText("Server is Alive!");
+                }
+            }catch(JSONException e){
+                textview.setText("Server Offline!");
+            }
         }
         }
+
+    /**
+     * Lead user to the Login screen.
+     */
     private void goToLoginScreen()
     {
-        Intent intent = new Intent(this, Login3.class);
+        Intent intent = new Intent(this, Login.class);
         startActivity(intent);
     }
 
+    /**
+     * Lead user to the Register screen.
+     */
     private void goToRegisterScreen()
     {
         Intent intent = new Intent(this, Register.class);

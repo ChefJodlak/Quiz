@@ -1,10 +1,7 @@
 package com.example.quiz;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,11 +9,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import com.example.quiz.login.LogInUser;
 import com.example.quiz.login.LoginUtils;
-import com.example.quiz.login.UserData;
 import com.example.quiz.utilities.ViewDialog;
 
-
-public class Login3 extends AppCompatActivity {
+/**
+ * The Login class is made for checking if the user has provided a correct data and to try to
+ * Log In a User.
+ */
+public class Login extends AppCompatActivity {
 
     EditText usernameEditText, passwordEditText;
     String username, password;
@@ -40,8 +39,9 @@ public class Login3 extends AppCompatActivity {
         final Context context = this;
         final Activity activity = this;
 
+        //On click check if user provided a correct data and if it is correct then execute a
+        //LonInUser Class
         loginButton.setOnClickListener(new View.OnClickListener() {
-
 
             @Override
             public void onClick(View v) {

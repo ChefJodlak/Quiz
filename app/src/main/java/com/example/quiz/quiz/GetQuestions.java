@@ -2,6 +2,10 @@ package com.example.quiz.quiz;
 
 import org.json.*;
 
+/**
+ * The GetQuestion class is made for parsing the json with the question, answer and ids for the
+ * Quiz purposes.
+ */
 public class GetQuestions {
 
     public String questionID, question, answer1, answer2, answer3, answer4;
@@ -31,6 +35,11 @@ public class GetQuestions {
         this.answer4 = answer4;
     }
 
+    /**
+     * Parse a json and set the values of the variables.
+     *
+     * @param unparsedJSON          json with the answers, question and questionId
+     */
     private void parseJSON(String unparsedJSON){
 
         try {
